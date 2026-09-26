@@ -234,6 +234,31 @@ DELETE /api/projects/{id}
 
 Returns `204 No Content`, or `404` if the project doesn't exist.
 
+## Features Implemented
+
+- List all projects in a dashboard table with status and priority badges
+- Search projects by client name or project name
+- Filter projects by status and by priority
+- Sort projects by project name, start date, due date, or priority
+- View full details of a single project
+- Create a new project, with client- and server-side validation
+- Edit an existing project
+- Delete a project, gated behind a confirmation dialog
+- Loading, empty, and error states on the frontend for every data-fetching view
+- Consistent JSON API responses and correct HTTP status codes (200, 201, 204, 404, 422) for every endpoint
+- Server-side enforcement of required fields, allowed `status`/`priority` values, and the due-date-not-before-start-date rule
+- Backend feature-test suite covering CRUD, validation, and 404 cases
+
+## Assumptions Made
+
+- **No authentication/authorization.** The spec didn't call for user accounts or login, so all projects are globally visible and editable — this would need to change before any real multi-user deployment.
+- **No pagination.** `GET /api/projects` returns every project in one response. Fine for the expected demo/sample data volume; would need pagination at real scale.
+- **`PUT` only, no `PATCH`.** The edit form always submits the full record, so partial updates weren't implemented.
+- **Dates are plain calendar dates with no timezone handling.** `start_date`/`due_date` are stored and compared as `YYYY-MM-DD` strings; no timezone conversion is applied.
+- **No soft deletes.** Deleting a project is permanent (matches the `204 No Content` / irreversible confirmation-dialog wording in the spec).
+- **Single "status" and "priority" set, not configurable.** The four status values and three priority values are hardcoded (in `Project::STATUSES` / `Project::PRIORITIES` on the backend and mirrored in the frontend types) rather than stored in the database, since the spec fixed these lists.
+- **CORS is left open for local development.** `config/cors.php` currently allows the Vite dev server origin via `FRONTEND_URL`; a production deployment would need this tightened to the real frontend domain.
+
 ## Running Tests
 
 ```bash
